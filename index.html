@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#b91c1c">
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hisab">
+<title>Balaji Wafers – Hisab</title>
+<style>
+  :root{--bg:#f3f0ea;--card:#fffdf9;--fg:#201d19;--mut:#6f675d;--bd:#ddd5c8;--brand:#b91c1c;--tint:#fbf1d6;--cell:#e9f1f4;--ink:#12263a}
+  @media (prefers-color-scheme: dark){:root{--bg:#15130f;--card:#1f1c17;--fg:#f1ece3;--mut:#a39a8d;--bd:#3a352d;--tint:#2d2711;--cell:#1b2a31;--ink:#e6eef2}}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-variant-numeric:tabular-nums}
+  button{font:inherit;cursor:pointer}
+  .page{max-width:1100px;margin:auto;padding:0 10px calc(76px + env(safe-area-inset-bottom))}
+
+  /* header */
+  .top{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--bd);padding-top:env(safe-area-inset-top)}
+  .top .in{max-width:1100px;margin:auto;padding:6px 10px;display:flex;align-items:center;gap:10px}
+  .brand{font-weight:700;font-size:17px;margin-right:auto;line-height:1.1}
+  .brand small{display:block;font-weight:500;font-size:12px;color:var(--mut)}
+  .month{display:flex;align-items:center;border:1px solid var(--bd);border-radius:8px;background:var(--bg)}
+  .month button{border:0;background:none;color:var(--fg);width:34px;height:34px;font-size:20px}
+  .month button:active{background:var(--bd)}
+  .month input{border:0;background:none;color:var(--fg);font:600 14px system-ui;width:120px;text-align:center;height:34px}
+
+  /* summary */
+  .sum{margin-top:8px;background:var(--brand);color:#fff;border-radius:10px;padding:10px 12px}
+  .sum .row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end}
+  .sum .l{font-size:10.5px;letter-spacing:.7px;opacity:.85}
+  .sum .g{font-size:clamp(20px,6.2vw,28px);font-weight:700;line-height:1.15;white-space:nowrap}
+  .sum .r{text-align:right}
+  .sum .w{margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.25);font-size:12px;opacity:.92;text-transform:capitalize}
+  .sum .w span{display:inline-block;animation:fade .35s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .tools{display:flex;align-items:center;gap:8px;margin:10px 2px 6px}
+  .tools h2{margin:0;font-size:14px;margin-right:auto}
+  .tools input{border:1px solid var(--bd);background:var(--card);color:var(--fg);border-radius:8px;padding:6px 9px;font-size:13px;width:120px}
+  .addtop{border:1px solid var(--brand);color:var(--brand);background:none;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;white-space:nowrap}
+  .addtop:active{background:var(--brand);color:#fff}
+
+  /* table (sheet jaisa compact) */
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--card);border:1px solid var(--bd);border-radius:10px}
+  table{border-collapse:collapse;width:100%}
+  th,td{border-bottom:1px solid var(--bd);border-right:1px solid var(--bd);padding:2px;text-align:center;vertical-align:middle}
+  tbody tr:last-child td{border-bottom:0}
+  .lab{position:sticky;left:0;z-index:2;background:var(--card);box-shadow:1px 0 0 var(--bd);text-align:right;font:700 11.5px system-ui;color:var(--mut);padding:2px 6px;white-space:nowrap;width:1%}
+  .nm{position:relative;min-width:52px;border-top:2px solid var(--c);padding:3px 1px}
+  .nm input{width:100%;border:0;background:none;color:var(--fg);font:700 11.5px system-ui;text-align:center;padding:5px 0;outline:0;border-radius:4px}
+  .nm input:focus{background:color-mix(in srgb,var(--c) 14%,transparent)}
+  .nm input::placeholder{font-weight:500;color:var(--mut)}
+  .rm{display:none;position:absolute;top:-1px;right:-1px;width:18px;height:18px;line-height:18px;border:0;background:var(--brand);color:#fff;font-size:10px;border-radius:0 0 0 6px;padding:0;z-index:3}
+  .nm:focus-within .rm{display:block}
+  td[data-i]{min-width:52px;background:var(--cell)}
+  .num{width:100%;min-width:0;border:0;background:transparent;color:var(--ink);font:700 14px system-ui;text-align:right;padding:7px 5px;outline:0;border-radius:4px;-moz-appearance:textfield}
+  .num::-webkit-inner-spin-button,.num::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+  .num:focus{background:var(--card);box-shadow:inset 0 0 0 2px var(--c)}
+  .tt{background:var(--tint);font:700 13px system-ui;text-align:right;padding:2px 6px;white-space:nowrap}
+  .tn{min-width:40px}
+  .ta{min-width:62px}
+  th.tt{font-size:10px;color:var(--mut);text-align:center;line-height:1.15}
+  .tt.dim{color:var(--mut);font-weight:400}
+  tr.tot td{border-top:2px solid var(--fg);font-weight:700;font-size:12.5px}
+  tr.tot td[data-i]{background:var(--card)}
+  .pop{animation:pop .3s ease}
+  @keyframes pop{40%{background:#ffe27a}}
+
+  /* entry date */
+  .datebar{margin-top:8px;display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:6px 10px}
+  .dl{font-size:11px;font-weight:700;color:var(--mut);line-height:1.15}
+  .dl small{display:block;font-weight:500;font-size:10px}
+  #edate{border:1px solid var(--bd);background:var(--bg);color:var(--fg);border-radius:8px;padding:6px 8px;font:700 14px system-ui}
+  .dd{font-weight:700;font-size:13px;margin-left:auto;text-align:right}
+  .dtoday{border:1px solid var(--brand);color:var(--brand);background:none;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700}
+  .dtoday:active{background:var(--brand);color:#fff}
+
+  /* bottom action bar */
+  .act{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--bd);padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
+  .act .in{max-width:1100px;margin:auto;display:flex;align-items:center;gap:10px}
+  .dirty{margin-right:auto;font-size:12px;color:#b45309;font-weight:600;visibility:hidden}
+  .dirty.on{visibility:visible}
+  .btn{border-radius:10px;padding:10px 16px;font-weight:700;border:1px solid var(--bd);background:var(--card);color:var(--fg)}
+  .btn:active{transform:scale(.97)}
+  .btn.main{background:var(--brand);border-color:var(--brand);color:#fff;min-width:130px}
+  .btn.main.ok{background:#15803d;border-color:#15803d}
+  .btn:disabled{opacity:.6}
+
+  /* history */
+  .ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:40;padding:12px}
+  .ov.on{display:flex}
+  .pn{background:var(--card);border-radius:14px;width:100%;max-width:960px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
+  .ph{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--bd)}
+  .ph b{font-size:16px;margin-right:auto}
+  .ph input{border:1px solid var(--bd);background:var(--bg);color:var(--fg);border-radius:8px;padding:8px 10px;font-size:16px;width:190px}
+  .ph .rm{position:static;width:34px;height:34px;font-size:16px}
+  .chips{display:flex;gap:6px;padding:8px 14px;overflow-x:auto;border-bottom:1px solid var(--bd)}
+  .chip{border:1px solid var(--bd);background:var(--bg);color:var(--fg);border-radius:18px;padding:6px 13px;font-size:13px;font-weight:600;white-space:nowrap}
+  .chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  .hw{overflow:auto;flex:1;-webkit-overflow-scrolling:touch}
+  .hw table{font-size:13px;min-width:640px}
+  .hw th{position:sticky;top:0;background:var(--card);color:var(--mut);font-size:12px;z-index:1}
+  .hw td,.hw th{padding:7px 8px}
+  .hw td:nth-child(2),.hw th:nth-child(2){text-align:left;font-weight:700}
+  .hs{padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--bd);display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-weight:600;font-size:13px}
+  .hs span{margin-right:auto}
+  .hs .btn{padding:9px 14px}
+  .hm{padding:28px;text-align:center;color:var(--mut)}
+
+  .dayrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--bd);background:var(--card);color:var(--fg);padding:12px 14px}
+  .dayrow:active{background:var(--bd)}
+  .dayrow .a{flex:1;min-width:0}
+  .dayrow b{font-size:15px}
+  .dayrow small{display:block;color:var(--mut);font-size:12px}
+  .dayrow .r{text-align:right;font-size:11px;color:var(--mut)}
+  .dayrow .r strong{display:block;font-size:15px;color:var(--fg)}
+  .dayrow .go{color:var(--mut);font-size:20px}
+  .dv{position:fixed;inset:0;z-index:50;background:var(--bg);display:none;flex-direction:column}
+  .dv.on{display:flex}
+  .dvt{display:flex;align-items:center;gap:10px;padding:8px 10px;padding-top:calc(8px + env(safe-area-inset-top));background:var(--card);border-bottom:1px solid var(--bd)}
+  .dvt b{font-size:15px}
+  .dvb{overflow:auto;flex:1;padding:0 10px calc(24px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}
+  .ro{font:700 14px system-ui;color:var(--ink);text-align:right;padding:7px 6px;min-height:32px}
+  .rn{font:700 11.5px system-ui;text-align:center;padding:5px 2px;word-break:break-word}
+  .toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translate(-50%,40px);opacity:0;background:#222;color:#fff;padding:10px 18px;border-radius:10px;font-size:14px;transition:all .25s;z-index:60;pointer-events:none;max-width:90vw;text-align:center}
+  .toast.show{transform:translate(-50%,0);opacity:1}
+
+  @media (max-width:640px){
+    .tools input{width:96px}
+    .ov{align-items:flex-end;padding:0}
+    .pn{border-radius:14px 14px 0 0;max-height:92vh}
+    .ph{flex-wrap:wrap}
+    .ph input{order:3;width:100%;font-size:16px}
+    .btn.main{flex:1}
+    .brand{font-size:15px}
+    .month input{width:106px}
+  }
+</style>
+</head>
+<body>
+
+<header class="top"><div class="in">
+  <div class="brand">Balaji Wafers<small>Roz ka hisab</small></div>
+  <div class="month">
+    <button onclick="shift(-1)" aria-label="Pichla mahina">‹</button>
+    <input type="month" id="month" onchange="monthChanged()">
+    <button onclick="shift(1)" aria-label="Agla mahina">›</button>
+  </div>
+</div></header>
+
+<main class="page">
+  <div class="datebar">
+    <div class="dl">Entry ki date<small id="ehint">device se auto</small></div>
+    <input type="date" id="edate" onchange="dateChanged()">
+    <button class="dtoday" id="etoday" onclick="dateToday()">Aaj</button>
+    <div class="dd" id="eday"></div>
+  </div>
+
+  <section class="sum">
+    <div class="row">
+      <div><div class="l">NOTE TOTAL</div><div class="g">₹ <span id="gn">0</span></div></div>
+      <div class="r"><div class="l">CASH + CHILLER</div><div class="g">₹ <span id="gg">0</span></div></div>
+    </div>
+    <div class="w"><span id="words">zero</span></div>
+  </section>
+
+  <div class="tools">
+    <h2>Ladke</h2>
+    <input id="q" placeholder="Naam dhundo" oninput="applyFilter()">
+    <button class="addtop" onclick="addPerson()">＋ Naya ladka</button>
+  </div>
+  <div class="tw"><table id="tbl"></table></div>
+</main>
+
+<nav class="act"><div class="in">
+  <span class="dirty" id="dirty">● Save nahi hua</span>
+  <button class="btn" onclick="openHistory()">History</button>
+  <button class="btn main" id="saveBtn" onclick="save()">Save</button>
+</div></nav>
+
+<div class="ov" id="ov" onclick="if(event.target===this)closeHistory()"><div class="pn">
+  <div class="ph"><b>History</b><button class="rm" onclick="closeHistory()" aria-label="Band karo">✕</button><input id="hq" placeholder="Naam se dhundo" oninput="renderHistory()"></div>
+  <div class="chips" id="chips"></div>
+  <div class="hw" id="hlist"></div>
+  <div class="hs" id="hs"></div>
+</div></div>
+
+<div class="dv" id="dv">
+  <div class="dvt"><button class="btn" onclick="closeDay()">‹ Wapas</button><b id="dvtitle"></b></div>
+  <div class="dvb">
+    <section class="sum">
+      <div class="row">
+        <div><div class="l">NOTE TOTAL</div><div class="g">₹ <span id="dgn">0</span></div></div>
+        <div class="r"><div class="l">CASH + CHILLER</div><div class="g">₹ <span id="dgg">0</span></div></div>
+      </div>
+      <div class="w" id="dwords"></div>
+    </section>
+    <div class="tw" style="margin-top:10px"><table id="dtbl"></table></div>
+    <div id="dvfoot" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Apna Apps Script Web app URL yaha paste karo
+const URL_API = "https://script.google.com/macros/s/AKfycbwTD403hJmvAWev7JwUqU7Dw5UjEE8sGgGnnt2tBu3ouHGwWuCOhDXzPwKet8OKk0Nk/exec";
+
+const DEN = [500,200,100,50,20,10];
+const DEFAULT_COLS = 5;
+const COLORS = ['#b91c1c','#1d4ed8','#15803d','#7e22ce','#c2410c','#0e7490','#a21caf','#4d7c0f'];
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,'0');
+const localDate = d => d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());   // device ka local time
+const fmt = n => Number(n).toLocaleString('en-IN');
+const n = v => Math.max(0, Math.floor(Number(v)||0));
+const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let people = [];
+let dirty = false;
+let focusLast = false;
+
+$('month').value = localDate(new Date()).slice(0,7);
+
+// ---- entry date: device (phone/laptop) ki local date se apne aap
+let entryDate = localDate(new Date()), dateManual = false;
+const DAYS = ['Ravivar','Somvar','Mangalvar','Budhvar','Guruvar','Shukravar','Shanivar'];
+function showDate(){
+  const [y,m,d] = entryDate.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  $('edate').value = entryDate;
+  $('eday').textContent = DAYS[dt.getDay()] + ' · ' + d + ' ' + dt.toLocaleString('en-IN',{month:'short'}) + ' ' + y;
+  $('ehint').textContent = dateManual ? 'haath se badli' : 'device se auto';
+  $('etoday').style.display = dateManual ? '' : 'none';
+}
+function dateChanged(){
+  const v = $('edate').value, t = localDate(new Date());
+  entryDate = v || t;
+  dateManual = entryDate !== t;
+  showDate();
+}
+function dateToday(){ dateManual = false; entryDate = localDate(new Date()); showDate(); }
+function syncToday(){                       // raat 12 ke baad page khula ho to date badal jaye
+  if(dateManual) return;
+  const t = localDate(new Date());
+  if(t !== entryDate){ entryDate = t; showDate(); }
+}
+document.addEventListener('visibilitychange', syncToday);
+window.addEventListener('focus', syncToday);
+setInterval(syncToday, 60000);
+showDate();
+
+function setDirty(v){ dirty = v; $('dirty').classList.toggle('on', v); }
+window.addEventListener('beforeunload', e => { if(dirty){ e.preventDefault(); e.returnValue=''; } });
+
+function newPerson(){
+  const notes = {}; DEN.forEach(d => notes[d] = '');
+  return {name:'', date:'', isNew:true, notes, chiller:''};   // date save par entry date se lagegi
+}
+function hasData(p){ return p.name.trim() || p.chiller !== '' || DEN.some(d => p.notes[d] !== ''); }
+function fillDefaults(){ while(people.length < DEFAULT_COLS) people.push(newPerson()); }
+
+function addPerson(){ people.push(newPerson()); focusLast = true; setDirty(true); render(); }
+function removePerson(i){
+  if(hasData(people[i]) && !confirm((people[i].name || 'Ye column') + ' hata du? (Save karne par sheet se bhi hat jayega)')) return;
+  people.splice(i,1); setDirty(true); render();
+}
+
+function render(){
+  const col = i => COLORS[i % COLORS.length];
+  let h = '<thead><tr><th class="lab"></th>';
+  people.forEach((p,i)=>{
+    h += `<th class="nm" data-i="${i}" style="--c:${col(i)}"><input placeholder="Naam" autocomplete="off" value="${esc(p.name)}" oninput="people[${i}].name=this.value;setDirty(true);applyFilter()"><button class="rm" aria-label="Hatao" onpointerdown="event.preventDefault()" onclick="removePerson(${i})">✕</button></th>`;
+  });
+  h += '<th class="tt tn">NOTE</th><th class="tt ta">₹</th></tr></thead><tbody>';
+
+  DEN.forEach(d=>{
+    h += `<tr><td class="lab">${d}</td>`;
+    people.forEach((p,i)=> h += `<td data-i="${i}" style="--c:${col(i)}"><input class="num" type="number" inputmode="numeric" enterkeyhint="next" min="0" value="${p.notes[d]}" oninput="people[${i}].notes[${d}]=this.value;setDirty(true);calc()"></td>`);
+    h += `<td class="tt tn" id="tn${d}">0</td><td class="tt ta" id="ta${d}">0</td></tr>`;
+  });
+
+  h += '<tr><td class="lab">Chiller</td>';
+  people.forEach((p,i)=> h += `<td data-i="${i}" style="--c:${col(i)}"><input class="num" type="number" inputmode="numeric" enterkeyhint="done" min="0" value="${p.chiller}" oninput="people[${i}].chiller=this.value;setDirty(true);calc()"></td>`);
+  h += '<td class="tt tn dim">—</td><td class="tt ta" id="tch">0</td></tr>';
+
+  h += '<tr class="tot"><td class="lab">Total</td>';
+  people.forEach((p,i)=> h += `<td data-i="${i}"><span id="pt${i}">0</span></td>`);
+  h += '<td class="tt tn" id="tnall">0</td><td class="tt ta" id="tgrand">0</td></tr></tbody>';
+
+  $('tbl').innerHTML = h;
+  if(focusLast){
+    const ins = document.querySelectorAll('.nm input'); const el = ins[ins.length-1];
+    el.focus(); el.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+    focusLast = false;
+  }
+  applyFilter(); calc();
+}
+
+function applyFilter(){
+  const q = $('q').value.trim().toLowerCase();
+  document.querySelectorAll('#tbl [data-i]').forEach(el=>{
+    const p = people[el.dataset.i];
+    el.style.display = (!q || p.name.toLowerCase().includes(q)) ? '' : 'none';
+  });
+}
+
+// Enter: usi ladke ke niche wale box me, phir agle ladke me
+document.addEventListener('keydown', e=>{
+  if(e.key !== 'Enter' || !e.target.matches('.tw .num')) return;
+  const all = [...document.querySelectorAll('.tw .num')].sort((a,b)=>
+    (+a.parentNode.dataset.i - +b.parentNode.dataset.i) || (a.closest('tr').rowIndex - b.closest('tr').rowIndex));
+  const nx = all[all.indexOf(e.target)+1];
+  e.preventDefault();
+  if(nx){ nx.focus(); nx.select(); } else e.target.blur();
+});
+document.addEventListener('focusin', e=>{ if(e.target.matches('.tw .num')) e.target.select(); });
+
+function tween(el, to){
+  if(!el) return;
+  const from = Number(el.dataset.v || 0);
+  if(from === to){ el.textContent = fmt(to); return; }
+  el.dataset.v = to;
+  if(el.classList.contains('tt')){ el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+  const t0 = performance.now(), dur = 400;
+  (function step(t){
+    const k = Math.min(1,(t-t0)/dur), e = 1 - Math.pow(1-k,3);
+    el.textContent = fmt(Math.round(from + (to-from)*e));
+    if(k < 1 && Number(el.dataset.v) === to) requestAnimationFrame(step);
+  })(t0);
+}
+
+let lastWords = '';
+function calc(){
+  let notes = 0, ch = 0, active = 0, cntAll = 0;
+  DEN.forEach(d=>{
+    const cnt = people.reduce((s,p)=> s + n(p.notes[d]), 0);
+    cntAll += cnt; notes += cnt*d;
+    tween($('tn'+d), cnt); tween($('ta'+d), cnt*d);
+  });
+  people.forEach((p,i)=>{
+    const c = n(p.chiller); ch += c;
+    const pn = DEN.reduce((s,d)=> s + d*n(p.notes[d]), 0);
+    if(pn + c > 0) active++;
+    tween($('pt'+i), pn + c);
+  });
+  tween($('tch'), ch); tween($('tnall'), cntAll); tween($('tgrand'), notes + ch);
+  tween($('gn'), notes); tween($('gg'), notes + ch);
+  const w = words(notes);
+  if(w !== lastWords){ lastWords = w; $('words').outerHTML = `<span id="words">${w}</span>`; }
+}
+
+// Number to English words (Indian style: lakh, crore)
+function words(n){
+  if(n === 0) return 'zero';
+  const ones = ['','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+  const tens = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+  const b100 = x => x<20 ? ones[x] : tens[Math.floor(x/10)] + (x%10 ? '-' + ones[x%10] : '');
+  const b1000 = x => (x>=100 ? ones[Math.floor(x/100)] + ' hundred' + (x%100?' ':'') : '') + (x%100 ? b100(x%100) : '');
+  const out = [];
+  const cr = Math.floor(n/10000000); n %= 10000000;
+  const lk = Math.floor(n/100000); n %= 100000;
+  const th = Math.floor(n/1000); n %= 1000;
+  if(cr) out.push(b100(cr) + ' crore');
+  if(lk) out.push(b100(lk) + ' lakh');
+  if(th) out.push(b100(th) + ' thousand');
+  if(n) out.push(b1000(n));
+  return out.join(' ');
+}
+
+function dstr(v){ return typeof v === 'string' ? v.slice(0,10) : localDate(new Date(v)); }
+let toastT;
+function toast(t){ const e = $('toast'); e.textContent = t; e.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(()=>e.classList.remove('show'), 2200); }
+
+function shift(n){
+  const [y,m] = $('month').value.split('-').map(Number);
+  const d = new Date(y, m-1+n, 1);
+  if(dirty && !confirm('Is mahine ka data save nahi hua. Phir bhi mahina badlu?')) return;
+  $('month').value = d.getFullYear()+'-'+pad(d.getMonth()+1); setDirty(false); load();
+}
+function monthChanged(){
+  if(dirty && !confirm('Is mahine ka data save nahi hua. Phir bhi mahina badlu?')) return;
+  setDirty(false); load();
+}
+
+let loadedMonth = null, loadSeq = 0;
+
+async function load(){
+  const m = $('month').value, seq = ++loadSeq;
+  loadedMonth = null;
+  if(URL_API.startsWith('PASTE')){ people = []; fillDefaults(); render(); toast('Pehle file me Web app URL daalo'); return; }
+  try{
+    const r = await fetch(URL_API + '?month=' + m);
+    const rows = await r.json();
+    if(seq !== loadSeq) return;                       // purana jawab, ignore
+    if(!Array.isArray(rows)) throw new Error('galat jawab aaya');
+    people = rows.map(r => {
+      const notes = {}; DEN.forEach((d,i)=> notes[d] = r[2+i] === 0 ? '' : r[2+i]);
+      return {name:String(r[1]), date:dstr(r[0]), isNew:false, notes, chiller: r[9] === 0 ? '' : r[9]};
+    });
+    fillDefaults(); render(); setDirty(false); loadedMonth = m;
+  }catch(e){ if(seq === loadSeq) toast('Data load nahi hua, save band hai. Page refresh karo.'); }
+}
+
+async function save(){
+  if(URL_API.startsWith('PASTE')){ toast('Pehle file me Web app URL daalo'); return; }
+  const m = $('month').value;
+  if(loadedMonth !== m){ toast('Is mahine ka data load nahi hua. Page refresh karke phir save karo.'); return; }
+
+  // number hain par naam nahi -> save mat karo, warna wo column chup-chap ud jata
+  const bad = people.findIndex(p => !p.name.trim() && (p.chiller !== '' || DEN.some(d => p.notes[d] !== '')));
+  if(bad >= 0){
+    $('q').value = ''; applyFilter();
+    const el = document.querySelectorAll('.nm input')[bad];
+    el.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'}); el.focus();
+    toast('Is column me number hain par naam nahi hai');
+    return;
+  }
+
+  // nayi entry ki date is mahine ki honi chahiye
+  if(people.some(p => p.name.trim() && p.isNew && entryDate.slice(0,7) !== m)){
+    toast('Entry ki date is mahine ki nahi hai. Date ya mahina theek karo.');
+    $('edate').scrollIntoView({block:'center'}); $('edate').focus();
+    return;
+  }
+
+  const rows = people.filter(p => p.name.trim()).map(p => ({
+    person:p.name.trim(), date: p.isNew ? entryDate : p.date,
+    notes:Object.fromEntries(DEN.map(d => [d, n(p.notes[d])])),
+    chiller:n(p.chiller)
+  }));
+  if(!rows.length && !confirm('Koi ladka nahi hai. Is mahine ka saara data sheet se hat jayega. Pakka?')) return;
+
+  const b = $('saveBtn'); b.disabled = true; b.textContent = 'Saving...';
+  try{
+    const r = await fetch(URL_API, {method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify({month:m, rows})});
+    const j = await r.json();
+    if(j.ok){ people.forEach(p => { if(p.name.trim() && p.isNew){ p.isNew = false; p.date = entryDate; } }); setDirty(false); b.classList.add('ok'); b.textContent = '✔ Saved'; toast('Hisab save ho gaya'); setTimeout(()=>{ b.classList.remove('ok'); b.textContent = 'Save'; }, 1600); }
+    else { toast('Save nahi hua, dobara try karo'); b.textContent = 'Save'; }
+  }catch(e){ toast('Save nahi hua: ' + e.message); b.textContent = 'Save'; }
+  b.disabled = false;
+}
+
+// ---------- History (date-wise) ----------
+let histData = [], histMonths = [], histMonth = 'all';
+const fmtD = iso => iso.slice(8,10) + '/' + iso.slice(5,7) + '/' + iso.slice(0,4);
+const dayName = iso => { const [y,m,d] = iso.split('-').map(Number); return DAYS[new Date(y, m-1, d).getDay()]; };
+
+async function openHistory(){
+  if(URL_API.startsWith('PASTE')){ toast('Pehle file me Web app URL daalo'); return; }
+  $('ov').classList.add('on');
+  $('chips').innerHTML = ''; $('hs').innerHTML = '';
+  $('hlist').innerHTML = '<div class="hm">Load ho raha hai...</div>';
+  try{
+    const ms = await (await fetch(URL_API + '?action=months')).json();
+    const parts = await Promise.all(ms.map(async m => {
+      const rows = await (await fetch(URL_API + '?month=' + m)).json();
+      return rows.map(r => ({month:m, date:dstr(r[0]), name:String(r[1]), notes:r.slice(2,8).map(Number), nt:Number(r[8])||0, ch:Number(r[9])||0, tot:Number(r[10])||0}));
+    }));
+    histMonths = ms; histData = parts.flat(); histMonth = 'all';
+    renderHistory();
+  }catch(e){ $('hlist').innerHTML = '<div class="hm">Error: ' + esc(e.message) + '</div>'; }
+}
+function closeHistory(){ $('ov').classList.remove('on'); }
+function pickMonth(m){ histMonth = m; renderHistory(); }
+function openMonth(m){
+  if(dirty && !confirm('Abhi ka data save nahi hua. Phir bhi mahina badlu?')) return;
+  $('month').value = m; setDirty(false); closeDay(); closeHistory(); load();
+}
+
+function renderHistory(){
+  const q = $('hq').value.trim().toLowerCase();
+  $('chips').innerHTML = ['all', ...histMonths].map(m =>
+    `<button class="chip ${m===histMonth?'on':''}" onclick="pickMonth('${m}')">${m==='all'?'Sab':m}</button>`).join('');
+  const rows = histData.filter(r => (histMonth==='all' || r.month===histMonth) && (!q || r.name.toLowerCase().includes(q)));
+  if(!rows.length){ $('hlist').innerHTML = '<div class="hm">Koi data nahi mila</div>'; $('hs').innerHTML = ''; return; }
+  const days = {};
+  rows.forEach(r => {
+    const d = days[r.date] || (days[r.date] = {date:r.date, n:0, nt:0, tot:0});
+    d.n++; d.nt += r.nt; d.tot += r.tot;
+  });
+  const list = Object.values(days).sort((a,b) => b.date.localeCompare(a.date));
+  $('hlist').innerHTML = list.map(d =>
+    `<button class="dayrow" onclick="openDay('${d.date}')">
+       <div class="a"><b>${fmtD(d.date)}</b><small>${dayName(d.date)} · ${d.n} ladke${q ? ' (' + esc(q) + ')' : ''}</small></div>
+       <div class="r">Notes<strong>${fmt(d.nt)}</strong></div>
+       <div class="r">Cash+Chiller<strong>${fmt(d.tot)}</strong></div>
+       <span class="go">›</span></button>`).join('');
+  const sum = list.reduce((s,d) => s + d.tot, 0);
+  $('hs').innerHTML = `<span>${list.length} din · Cash+Chiller ₹${fmt(sum)}</span>` +
+    (histMonth !== 'all' ? `<button class="btn main" onclick="openMonth('${histMonth}')">Ye mahina edit karo</button>` : '');
+}
+
+// kisi date par click -> us din ka poora page (sirf dekhne ke liye)
+function openDay(date){
+  const rows = histData.filter(r => r.date === date);
+  const col = i => COLORS[i % COLORS.length];
+  const num = v => v ? fmt(v) : '';
+  let h = '<thead><tr><th class="lab"></th>';
+  rows.forEach((r,i)=> h += `<th class="nm" style="--c:${col(i)}"><div class="rn">${esc(r.name)}</div></th>`);
+  h += '<th class="tt tn">NOTE</th><th class="tt ta">₹</th></tr></thead><tbody>';
+  DEN.forEach((d,k)=>{
+    const cnt = rows.reduce((s,r)=> s + (r.notes[k]||0), 0);
+    h += `<tr><td class="lab">${d}</td>` + rows.map((r,i)=>`<td data-i="${i}"><div class="ro">${num(r.notes[k])}</div></td>`).join('') +
+         `<td class="tt tn">${fmt(cnt)}</td><td class="tt ta">${fmt(cnt*d)}</td></tr>`;
+  });
+  const ch = rows.reduce((s,r)=> s + r.ch, 0);
+  const notes = rows.reduce((s,r)=> s + r.nt, 0);
+  const cntAll = rows.reduce((s,r)=> s + r.notes.reduce((a,b)=>a+b,0), 0);
+  h += '<tr><td class="lab">Chiller</td>' + rows.map((r,i)=>`<td data-i="${i}"><div class="ro">${num(r.ch)}</div></td>`).join('') +
+       `<td class="tt tn dim">—</td><td class="tt ta">${fmt(ch)}</td></tr>`;
+  h += '<tr class="tot"><td class="lab">Total</td>' + rows.map(r=>`<td data-i="0">${fmt(r.tot)}</td>`).join('') +
+       `<td class="tt tn">${fmt(cntAll)}</td><td class="tt ta">${fmt(notes + ch)}</td></tr></tbody>`;
+  $('dtbl').innerHTML = h;
+  $('dvtitle').textContent = fmtD(date) + ' · ' + dayName(date);
+  $('dgn').textContent = fmt(notes);
+  $('dgg').textContent = fmt(notes + ch);
+  $('dwords').innerHTML = '<span>' + words(notes) + '</span>';
+  const month = rows[0] ? rows[0].month : date.slice(0,7);
+  $('dvfoot').innerHTML = `<button class="btn main" style="width:100%" onclick="openMonth('${month}')">Edit karne ke liye ${month} kholo</button>`;
+  $('dv').classList.add('on');
+  $('dv').querySelector('.dvb').scrollTop = 0;
+}
+function closeDay(){ $('dv').classList.remove('on'); }
+
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Escape') return;
+  if($('dv').classList.contains('on')) closeDay(); else closeHistory();
+});
+
+fillDefaults(); render(); load();
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js").catch(()=>{}))}</script>
+</body>
+</html>
